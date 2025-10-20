@@ -1,0 +1,21 @@
+clean очистка артефактов
+validate проверка структуры, все ли корректно
+compile компиляция java кода в .class
+test запускает unit тесты
+package упаковка в .jar
+verify проверка все ли тесты выполнились успешно
+install учтановка приложения (артефакта) в локальный репозиторий
+site генерация документации
+deploy отправка готового артефакта на удаленный репозиторий
+mvn -version
+mvn dependency:tree
+mvn dependency:list
+mvn help:effective-pom
+mvn clean verify -DskipTests //запускает приложения без теста
+mvn surefire:report в surefire можна посмотреть как выглядит в html
+mvn spring-boot:run
+mvn dependency:analyze
+mvn dependency:purge-local-repository
+mvn help:effective-pom//показывает полностю репозиторий родителький +мой
+mvn spring-boot:run//запускает з терминала остановить strg+c
+mvn test
