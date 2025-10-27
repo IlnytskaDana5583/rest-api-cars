@@ -177,8 +177,11 @@ public class RestApiCarController {
 
 
     @GetMapping("/price/between/{min}/{max}")
-    public ResponseEntity<List<Car>> getCarsByPriceBetween(@PathVariable Integer min, @PathVariable Integer max) {
-        List<Car> cars = carRepository.findByPriceBetween(min, max);
+    public ResponseEntity<List<Car>> getCarsByPriceBetween(@PathVariable Double min, @PathVariable Double max) {
+        if (max<min) {
+            return new ResponseEntity<>(new ArrayList<>(), HttpStatus.BAD_REQUEST);
+        }
+        List<Car> cars = carRepository.findByPriceBetween(min,max);
         if (cars.isEmpty()) {
             log.warn("No cars found in range {} - {}", min, max);
             return new ResponseEntity<>(cars, HttpStatus.NOT_FOUND);
@@ -198,7 +201,7 @@ public class RestApiCarController {
             }
     )
     @GetMapping("/price/under/{max}")
-    public ResponseEntity<List<Car>> getCarsUnder(@PathVariable Integer max) {
+    public ResponseEntity<List<Car>> getCarsUnder(@PathVariable Double max) {
         List<Car> cars = carRepository.findByPriceLessThanEqual(max);
         return cars.isEmpty()
                 ? new ResponseEntity<>(cars, HttpStatus.NOT_FOUND)
@@ -214,13 +217,37 @@ public class RestApiCarController {
     )
 
     @GetMapping("/price/over/{min}")
-    public ResponseEntity<List<Car>> getCarsOver(@PathVariable Integer min) {
+    public ResponseEntity<List<Car>> getCarsOver(@PathVariable Double min) {
         List<Car> cars = carRepository.findByPriceGreaterThanEqual(min);
         return cars.isEmpty()
                 ? new ResponseEntity<>(cars, HttpStatus.NOT_FOUND)
                 : new ResponseEntity<>(cars, HttpStatus.OK);
+    }
 
 
+    @Operation(summary = "Get cars by model",
+            description = "Returns a list of cars filtered by model",
+            responses = @ApiResponse(responseCode = "200",
+                    description = "Found cars with model"))
 
-}
+    @GetMapping("/model/{model}")
+    public ResponseEntity<List<Car>> getCarsByModel(@PathVariable String model) {
+        List<Car> filteredCars = carRepository.findCarByModelIgnoreCase(model);
+
+//        for (Car car : cars) {
+//            if (car.getColor().equalsIgnoreCase(color)) {
+//                filteredCars.add(car);
+//            }
+//        }
+        if (filteredCars.isEmpty()) {
+            log.warn("No cars found for model {}", model);
+            // Повертаємо повідомлення, якщо машин не знайдено
+            return new ResponseEntity<>(filteredCars, HttpStatus.NOT_FOUND);
+        } else
+
+            log.info("Found {} cars with model {}", filteredCars.size(), model);
+        return new ResponseEntity<>(filteredCars, HttpStatus.OK);
+    }
+
+
 }
